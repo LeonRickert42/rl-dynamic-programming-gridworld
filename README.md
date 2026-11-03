@@ -7,6 +7,12 @@ Implementierung und Visualisierung der Verfahren aus
 Alles läuft auf einer Gitterwelt, deren Modell (Übergänge `P` und Belohnungen `R`) **vollständig
 bekannt** ist. Das ist die Grundvoraussetzung für Dynamic Programming.
 
+> 📘 **Neu hier? Starte mit dem [Lernpfad](docs/LERNPFAD.md).** Er erklärt alles Schritt für Schritt
+> mit Bildern und sehr einfachen Worten, von „Was ist eine Policy?“ bis „Warum konvergiert Value Iteration?“.
+> Auch der ganze Code ist auf Deutsch und Zeile für Zeile einfach kommentiert.
+
+![Überblick](figures/00_ueberblick.png)
+
 ![Value Iteration Animation](figures/value_iteration.gif)
 
 ## Schnellstart
@@ -53,14 +59,16 @@ Alle drei Schemata sind einmal implementiert (`rldp/sweeps.py`) und werden sowoh
 rldp/
   gridworld.py        GridWorld: ASCII-Karte -> MDP (P[s,a,s'], R[s,a]), Wände, Ziel, Falle,
                       Teleporter, rutschiger Boden (slip), env.step() zum Simulieren
-  maps.py             Small Gridworld 4x4 (Silver), Sutton 5x5 (A/B, Pareigis-Folien), Labyrinth
+  maps.py             Small Gridworld 4x4 (Silver), Sutton 5x5 (A/B, Pareigis-Folien), Flur, Labyrinth
   policy.py           Policy als Tabelle π(a|s): uniform, deterministisch, greedy, P^π, R^π
   sweeps.py           Synchron / In-Place / Prioritised Sweeping + Messdaten (RunResult)
   evaluation.py       policy_evaluation(...), exact_policy_evaluation (lineares Gleichungssystem)
   improvement.py      q_values, greedy_policy, policy_improvement, policy_iteration (auch "modified")
   value_iteration.py  value_iteration(...)
   plotting.py         Heatmaps mit Policy-Pfeilen, Konvergenzkurven, GIF
-experiments/run_all.py  alle Experimente/Abbildungen
+experiments/run_all.py          alle Experimente, Abbildungen 01-09 und results/summary.md
+experiments/didactic_figures.py Lern-Abbildungen 00 und 10-14 (Policy, ein Backup, Flur, PS-Reihenfolge, Kontraktion)
+docs/LERNPFAD.md                Schritt-für-Schritt-Erklärung mit allen Bildern, Spickzettel und Prüfungsfragen
 tests/test_dp.py        Abgleich mit den Folienwerten, PI = VI, Modified PI, Prioritised Sweeping
 ```
 
@@ -80,6 +88,14 @@ print(pe.sweeps, pi.iterations, vi.total_backups)
 ```
 
 Eigene Karten: `GridWorld(["S..#", "...G"], gamma=0.9, step_reward=-1, goal_reward=10, slip=0.2)`.
+
+## Lern-Abbildungen (ausführlich erklärt im [Lernpfad](docs/LERNPFAD.md))
+
+| | |
+|---|---|
+| ![Policy](figures/10_was_ist_eine_policy.png) **Was ist eine Policy?** Drei Strategien und ihre Werte | ![Backup](figures/11_ein_backup_erklaert.png) **Ein Backup vorgerechnet:** Mittelwert (PE) vs. Maximum (VI) |
+| ![Flur](figures/12_flur_synchron_vs_inplace.png) **Flur:** Synchron vs. In-Place, die Reihenfolge entscheidet | ![PS](figures/13_prioritised_sweeping_reihenfolge.png) **Prioritised Sweeping** arbeitet vom Ziel rückwärts |
+| ![Kontraktion](figures/14_kontraktion.png) **Kontraktion:** Jeder Start führt zu V* | |
 
 ## Ergebnisse
 

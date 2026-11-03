@@ -1,4 +1,4 @@
-"""Heatmaps mit Policy-Pfeilen und Konvergenzkurven."""
+"""Bilder: Heatmaps (Farbe = Wert eines Feldes), Policy-Pfeile und Konvergenzkurven."""
 
 from __future__ import annotations
 
@@ -6,34 +6,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import animation
 
-# (dx, dy) in Bildkoordinaten für up, right, down, left
+# Pfeilrichtung im Bild (dx, dy) für ↑ → ↓ ←. Im Bild zeigt y nach UNTEN, darum ist "oben" = -1.
 _ARROW = ((0, -1), (1, 0), (0, 1), (-1, 0))
 
 
 def plot_values(ax, env, V, policy=None, title=None, *, annotate=True, fmt="{:.1f}", cmap="RdYlGn",
                 vmin=None, vmax=None, fontsize=None):
-    """Heatmap von V über der Karte; Wände dunkelgrau, optional Pfeile für π(a|s) > 0."""
+    """Zeichnet die Karte als Heatmap.
+
+    * Farbe eines Feldes = sein Wert V(s) (grün = gut, rot = schlecht)
+    * Wände: dunkelgrau, Ziel G: grün, Falle X: rot
+    * optional: Pfeile für die Policy (dicker/dunkler = höhere Wahrscheinlichkeit)
+    """
     grid = env.to_grid(np.asarray(V, dtype=float))
-    for s in np.flatnonzero(env.terminal):
+    for s in np.flatnonzero(env.terminal):  # terminale Felder bekommen eigene Farbe (unten)
         r, c = env.states[s]
         grid[r, c] = np.nan
     cm = plt.get_cmap(cmap).copy()
-    cm.set_bad("#3a3a3a")
+    cm.set_bad("#3a3a3a")  # NaN (Wände) = dunkelgrau
     im = ax.imshow(np.ma.masked_invalid(grid), cmap=cm, vmin=vmin, vmax=vmax)
-    fontsize = fontsize or max(5, 28 / max(env.shape))
+    fontsize = fontsize or max(5, 28 / max(env.shape))  # Schrift passend zur Kartengröße
+
     for s, (r, c) in enumerate(env.states):
         ch = env.grid[r][c]
-        if env.terminal[s]:
+        if env.terminal[s]:  # Ziel/Falle/Terminal als farbiges Feld mit Buchstabe
             color = {"G": "#1a9850", "X": "#d73027"}.get(ch, "#bbbbbb")
             ax.add_patch(plt.Rectangle((c - 0.5, r - 0.5), 1, 1, color=color))
             ax.text(c, r, ch, ha="center", va="center", fontsize=fontsize * 1.4, weight="bold", color="white")
             continue
-        if ch not in ".":
+        if ch not in ".":  # Sonderfelder (S, A, B, ...) klein oben links beschriften
             ax.text(c - 0.42, r - 0.42, ch, ha="left", va="top", fontsize=fontsize * 0.9, weight="bold")
-        if annotate:
+        if annotate:  # Zahlenwert ins Feld schreiben
             y = r + 0.28 if policy is not None else r
             ax.text(c, y, fmt.format(V[s]), ha="center", va="center", fontsize=fontsize)
-        if policy is not None:
+        if policy is not None:  # einen Pfeil pro Aktion mit Wahrscheinlichkeit > 0
             for a, p in enumerate(policy.probs[s]):
                 if p > 1e-9:
                     dx, dy = _ARROW[a]
@@ -47,9 +53,14 @@ def plot_values(ax, env, V, policy=None, title=None, *, annotate=True, fmt="{:.1
 
 
 def plot_error_curves(ax, curves: dict, n_states: int, title: str, ylabel="max. Fehler ||V − V_ref||∞"):
-    """curves: Name -> (backups, errors). x-Achse in Sweep-Äquivalenten (Backups / |S|)."""
+    """Fehler über Rechenaufwand, logarithmisch.
+
+    curves: Name -> (backups, errors). Die x-Achse ist "Backups / Anzahl Felder",
+    damit 1 auf der x-Achse ungefähr einem kompletten Durchlauf (Sweep) entspricht.
+    Eine GERADE Linie im log-Plot heißt: Der Fehler schrumpft jedes Mal um denselben Faktor.
+    """
     for name, (backups, errors) in curves.items():
-        errors = np.maximum(np.asarray(errors), 1e-12)
+        errors = np.maximum(np.asarray(errors), 1e-12)  # log(0) vermeiden
         ax.semilogy(np.asarray(backups) / n_states, errors, label=name, lw=1.6)
     ax.set_xlabel("Backups / Anzahl Zustände  (≈ Sweeps)")
     ax.set_ylabel(ylabel)
@@ -59,9 +70,9 @@ def plot_error_curves(ax, curves: dict, n_states: int, title: str, ylabel="max. 
 
 
 def save_value_animation(env, snapshots, path, policy_fn=None, title="Value Iteration", fps=3):
-    """GIF: wie sich die Werte Sweep für Sweep ausbreiten."""
+    """GIF-Animation: wie sich die Werte Sweep für Sweep über die Karte ausbreiten."""
     finite = np.concatenate(snapshots)
-    vmin, vmax = finite.min(), finite.max()
+    vmin, vmax = finite.min(), finite.max()  # feste Farbskala über alle Bilder
     fig, ax = plt.subplots(figsize=(1 + 0.6 * env.shape[1], 1 + 0.6 * env.shape[0]))
 
     def draw(k):

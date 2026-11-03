@@ -24,12 +24,14 @@ from rldp import (  # noqa: E402
 from rldp.maps import maze, small_gridworld, sutton_5x5  # noqa: E402
 from rldp.plotting import plot_error_curves, plot_values, save_value_animation  # noqa: E402
 
+from .didactic_figures import make_all as make_didactic_figures  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 FIG = ROOT / "figures"
 RES = ROOT / "results"
 NAMES = {"synchronous": "Synchron", "in_place": "In-Place", "prioritized": "Prioritised Sweeping"}
-THETA = 1e-6
-lines: list[str] = []
+THETA = 1e-6  # Genauigkeit: Abbruch, wenn sich kein Wert mehr um mehr als THETA ändert
+lines: list[str] = []  # sammelt den Text für results/summary.md
 
 
 def save(fig, name):
@@ -244,11 +246,14 @@ def main():
                   "*Backup* = ein Zustand wird aktualisiert. *Bellman-Auswertung* = jede Berechnung der",
                   "rechten Seite der Bellman-Gleichung (bei Prioritised Sweeping auch das Berechnen der",
                   "Bellman-Fehler, bei Policy Iteration auch der Improvement-Schritt).", ""])
+    make_didactic_figures()  # Lern-Grafiken 00, 10-14 (siehe docs/LERNPFAD.md)
+
     print("Folien-Beispiele …")
     small_gridworld_like_slides()
     sutton_5x5_like_pareigis()
 
     env = maze()
+    # V* als Referenz: Policy Iteration mit exakter Evaluation (lineares Gleichungssystem)
     v_star = policy_iteration(env, eval_method="exact").V
     print(f"{env.name}: {len(env.nonterminal_states)} nicht-terminale Zustände")
     pe_runs, _ = compare_policy_evaluation(env)

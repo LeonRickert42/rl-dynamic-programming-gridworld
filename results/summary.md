@@ -12,7 +12,7 @@ Bellman-Fehler, bei Policy Iteration auch der Improvement-Schritt).
 |---|---|---|---|---|---|
 | Synchron | 254.0 | 12700 | 12700 | 1.6 | 1.7e-05 |
 | In-Place | 196.0 | 9800 | 9800 | 30.4 | 1.3e-05 |
-| Prioritised Sweeping | 165.8 | 8290 | 33395 | 81.7 | 1.6e-05 |
+| Prioritised Sweeping | 165.8 | 8290 | 33395 | 80.2 | 1.6e-05 |
 
 ## Policy Iteration Schritt für Schritt (Labyrinth (slip=0.1, γ=0.95))
 
@@ -32,12 +32,12 @@ Bellman-Fehler, bei Policy Iteration auch der Improvement-Schritt).
 | Verfahren | Iterationen | Backups (Eval.) | Bellman-Auswertungen gesamt | Zeit [ms] | Fehler zu V* | π optimal? |
 |---|---|---|---|---|---|---|
 | Policy Iteration (volle Eval.) | 8 | 20500 | 20900 | 3.1 | 4.4e-07 | ja |
-| Modified PI (k = 10) | 9 | 4200 | 4650 | 1.0 | 1.3e-07 | ja |
+| Modified PI (k = 10) | 9 | 4200 | 4650 | 1.1 | 1.3e-07 | ja |
 | Modified PI (k = 3) | 17 | 2500 | 3350 | 1.2 | 2.5e-07 | ja |
 | Modified PI (k = 1) | 45 | 2250 | 4500 | 2.6 | 3.1e-07 | ja |
 | Value Iteration (Synchron) | 44.0 Sweeps | 2200 | 2200 | 0.5 | 3.4e-07 | ja |
 | Value Iteration (In-Place) | 34.0 Sweeps | 1700 | 1700 | 6.6 | 3.0e-07 | ja |
-| Value Iteration (Prioritised Sweeping) | 28.6 Sweeps | 1429 | 5777 | 18.1 | 3.7e-06 | ja |
+| Value Iteration (Prioritised Sweeping) | 28.6 Sweeps | 1429 | 5777 | 17.8 | 3.7e-06 | ja |
 
 ## Sweeps bis Konvergenz in Abhängigkeit von γ (Labyrinth, θ = 1e-06)
 
